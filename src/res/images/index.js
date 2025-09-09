@@ -16,4 +16,5 @@ export default {
   closeeye: require('./icons/closeeye.png'),
   openeye: require('./icons/openeye.png'),
   colonyGif: require('./icons/colony.gif'),
+  profileBackground: require('./icons/profileBackground.png'),
 };

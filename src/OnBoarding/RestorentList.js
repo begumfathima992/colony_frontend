@@ -1,175 +1,160 @@
+import React from 'react';
 import {
+  View,
   Text,
   StyleSheet,
-  View,
-  ImageBackground,
-  Image,
+  FlatList,
   TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  Keyboard,
-  ScrollView,
-  Platform,
-  Linking,
+  Image,
+  SafeAreaView,
+  ImageBackground,
 } from 'react-native';
-import React, { Component, useEffect, useState } from 'react';
-// import { Icons, Button, InputText, ErrorView,ActivityIndicator } from '@beverages/common';
-import { colors, family, fonts, metrics, styles } from '../themes';
-import {
-  validateName,
-  validateEmail,
-  validatePhone,
-  checkNormalData,
-  checkName,
-  checkEmail,
-  checkMobile,
-  checkPassword,
-  checkConfirmPassword,
-} from '../components/Validation';
+// import Icon from 'react-native-vector-icons/Ionicons'; // install if not installed: npm install react-native-vector-icons
 import { AppImages } from '../res';
-import InputText from '../components/InputText';
-import ErrorView from '../components/ErrorView';
-import Button from '../components/Button';
-import { postApi } from '../services/network/api';
+import Header from '../components/Header';
+import colors from '../themes/colors';
 
-export default function RestaurantList(props) {
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [hidePassword, setHidePassword] = useState(true);
+const ProfileScreen = props => {
+  const menuItems = [
+    { id: '1', title: 'Edit Profile' },
+    { id: '2', title: 'My Statement' },
+    { id: '3', title: 'My Benefits' },
+    { id: '4', title: 'Registered Offers' },
+    { id: '5', title: 'Change Password' },
+    { id: '6', title: 'Manage Your Consent' },
+    { id: '7', title: 'Settings' },
+    { id: '8', title: 'Terms & Conditions' },
+    { id: '9', title: 'Help & Support' },
+    { id: '10', title: 'Logout', isLogout: true },
+  ];
 
-  const [userNameError, setUserNameError] = useState({
-    status: false,
-    string: '',
-  });
-  const [passwordError, setPasswordError] = useState({
-    status: false,
-    string: '',
-  });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const setErrorState = () => {
-    if (userName === '') {
-      setUserNameError(checkNormalData(userName, 'Please enter Email ID.'));
-    }
-    if (password == '') {
-      setPasswordError(checkNormalData(password, 'Please enter password'));
-    }
-  };
-
-  const signIn = async () => {
-    const data = {
-      email: userName,
-      password: password,
-    };
-
-    setIsLoading(true);
-    const response = await postApi('login', data);
-    setIsLoading(false);
-
-    if (response.success) {
-      Alert.alert('Colony', response.message, [
-        {
-          text: 'OK',
-          onPress: () => {},
-        },
-      ]);
-    } else {
-      Alert.alert('Colony', response.message, [
-        {
-          text: 'OK',
-          onPress: () => {},
-        },
-      ]);
-    }
-  };
-
-  const submit = () => {
-    Keyboard.dismiss();
-    if (
-      !checkNormalData(userName, '').status &&
-      !checkNormalData(password, '').status
-    ) {
-      setErrorState();
-      signIn();
-    } else {
-      setErrorState();
-    }
-  };
-
-  const hideOnPress = () => {
-    setHidePassword(!hidePassword);
-  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() => console.log(item.title)}
+    >
+      <View style={styles.menuContent}>
+        {/* <Icon
+          name={item.icon}
+          size={22}
+          color={item.isLogout ? 'red' : '#444'}
+          style={styles.icon}
+        /> */}
+        <Text style={[styles.menuText, item.isLogout && styles.logoutText]}>
+          {item.title}
+        </Text>
+      </View>
+      {!item.isLogout && (
+        <Image
+          source={AppImages.arrownext}
+          style={{ height: 15, width: 15, tintColor: 'black' }}
+        />
+      )}
+    </TouchableOpacity>
+  );
 
   return (
-    <ImageBackground style={style.container} source={AppImages.ccc}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={[styles.container, { flex: 1 }]}
+    <SafeAreaView style={styles.container}>
+      <Header title="Profile" onPressMenu={() => props.navigation.goBack()} />
+      <ImageBackground
+        source={AppImages.profileBackground}
+        style={styles.headerBg}
+        resizeMode="cover"
       >
-        <TouchableOpacity
-          onPress={() =>
-            props.navigation.navigate('BottomTabs', { screen: 'Explore' })
-          }
-          style={{ marginTop: 50, marginLeft: 20 }}
-        >
-          <Image source={AppImages.Back} style={{ height: 25, width: 25 }} />
-        </TouchableOpacity>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          style={{ marginBottom: 60 }}
-        >
-          <View style={{ marginTop: '20%', alignSelf: 'center' }}>
-            <Image
-              style={{ height: 150, width: 200, resizeMode: 'contain' }}
-              source={AppImages.logo}
-            />
-          </View>
-          <Text style={style.getStart}>{`Restaurant List`}</Text>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+        <View style={styles.profileContainer}>
+          <Image
+            source={{
+              uri: 'https://i.pravatar.cc/150?img=12', // demo avatar
+            }}
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>Ankit Sharma</Text>
+          <Text style={styles.membership}>Membership no. 2007562529</Text>
+        </View>
+      </ImageBackground>
+
+      {/* Menu List */}
+      <FlatList
+        data={menuItems}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
   );
-}
+};
 
-const style = StyleSheet.create({
-  container: { ...styles.container },
-  getStart: {
-    fontFamily: 'Montserrat-medium',
-    textAlign: 'center',
-    fontSize: Platform.OS == 'ios' ? fonts.fs_36 : fonts.fs_30,
-
-    color: colors.white,
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // backgroundColor: '',
   },
-  information: {
-    ...family.Montserrat_Regular,
-    fontSize: fonts.fs_15,
-    marginLeft: 20,
-    color: colors.white,
-    fontWeight: Platform.OS == 'ios' ? '600' : null,
+  headerBg: {
+    width: '100%',
+    paddingBottom: 30,
   },
-  forgot: {
-    fontFamily: 'Verlag-Book',
-
-    fontSize: fonts.fs_18,
-    marginLeft: 20,
-    marginTop: 15,
-    color: colors.white,
-    textAlign: 'center',
+  profileContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    backgroundColor: 'rgba(255,255,255,0.7)', // transparent overlay for text visibility
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 16,
   },
-  already: {
-    fontSize: fonts.fs_16,
-    fontFamily: 'Montserrat-regular',
-    color: colors.black,
-    textAlign: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-
-    elevation: 8,
+  avatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 3,
+    borderColor: '#fff',
+    marginBottom: 10,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+    fontFamily: 'InstrumentSans_Condensed-Regular',
+  },
+  membership: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 4,
+    fontFamily: 'InstrumentSans_Condensed-bold',
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+    marginTop: 10,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 50,
+    width: '100%',
+    borderRadius: 5,
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    borderBottomColor: '#eee',
+  },
+  menuContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 12,
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#000',
+    fontFamily: 'InstrumentSans_Condensed-Regular',
+  },
+  logoutText: {
+    color: 'red',
+    fontWeight: '500',
   },
 });
+
+export default ProfileScreen;

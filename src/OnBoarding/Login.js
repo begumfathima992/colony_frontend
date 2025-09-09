@@ -48,9 +48,9 @@ export default function SignIn(props) {
   });
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    console.log('jjjjjjjj----', props?.route?.params.membership);
+    console.log('jjjjjjjj----', props?.route?.params?.membership);
     setUserName(props?.route?.params?.membership);
-  }, [props.route]);
+  }, [props?.route?.params]);
   const setErrorState = () => {
     if (userName === '') {
       setUserNameError(checkNormalData(userName, 'Please enter Email ID.'));
